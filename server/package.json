@@ -9,6 +9,10 @@
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^26.4.2"
   }
 }
