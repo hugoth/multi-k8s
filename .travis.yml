@@ -4,11 +4,11 @@ services:
 
 before_install:
   - docker build  -t hugotess/react-test -f ./frontend/Dockerfile.dev ./frontend
-  - docker build -t hugotess/server -f ./server/Dockerfile.dev ./server
+  #- docker build -t hugotess/server -f ./server/Dockerfile.dev ./server
 
 script:
   - docker run hugotess/react-test npm run test -- --coverage
-  - docker run hugotess/server npm run test -- --coverage
+  #- docker run hugotess/server npm run test -- --coverage
 
 after_success:
   - docker build -t hugotess/multi-frontend ./frontend # no need to specify dockerfile when it's not a special file name
