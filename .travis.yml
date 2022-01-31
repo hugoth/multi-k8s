@@ -24,3 +24,15 @@ after_success:
   - docker push hugotess/multi-server
   - docker push hugotess/multi-nginx
   - docker push hugotess/multi-worker
+
+deploy:
+  provider: elasticbeanstalk
+  region: 'eu-west-3'
+  app: 'multi-docker'
+  env: 'Multidocker-env'
+  bucket_name: 'elasticbeanstalk-eu-west-3-198608321204'
+  bucket_path: 'docker-multi'
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY

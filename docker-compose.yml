@@ -1,51 +1,31 @@
 version: '3'
-
 services:
-  postgres:
-    image: 'postgres:latest'
-    environment:
-      - POSTGRES_PASSWORD=postgres_password
-  redis:
-    image: 'redis:latest'
-  nginx:
-    restart: always # we need this service always up because it is routing traffic inside the entire app
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./nginx
-    ports:
-      - '3050:80' # Entry point
-  api: #change name from server to api in dockerfile to avoid complexification on nginx router set up
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./server
-    volumes:
-      - /app/node_modules # bookmark on the node_modules folder, inside the container don't override this folder, don't redirect access to it
-      - ./server:/app #redirec all access (except node_modules) to the app container to server folder
-    environment:
-      - REDIS_HOST=redis # name of service in docker-compose
-      - REDIS_PORT=6379 # default port of redis instance container
-      - PGUSER=postgres # default value
-      - PGHOST=postgres # name of service in docker-compose
-      - PGDATABASE=postgres # default value
-      - PGPASSWORD=postgres_password # default value
-      - PGPORT=5432 # default port of postgres instance container
-
   frontend:
-    stdin_open: true
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./frontend
-    volumes:
-      - /app/node_modules # bookmark on the node_modules folder, inside the container don't override this folder, don't redirect access to it
-      - ./frontend:/app #redirec all access (except node_modules) to the app container to server folder
-
-  worker:
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./worker
-    volumes:
-      - /app/node_modules # bookmark on the node_modules folder, inside the container don't override this folder, don't redirect access to it
-      - ./worker:/app #redirec all access (except node_modules) to the app container to server folder
+    image: 'hugotess/multi-frontend'
+    mem_limit: 128m
+    hostname: frontend
+  server:
+    image: 'hugotess/multi-server'
+    mem_limit: 128m
+    hostname: api
     environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - REDIS_HOST=$REDIS_HOST
+      - REDIS_PORT=$REDIS_PORT
+      - PGUSER=$PGUSER
+      - PGHOST=$PGHOST
+      - PGDATABASE=$PGDATABASE
+      - PGPASSWORD=$PGPASSWORD
+      - PGPORT=$PGPORT
+  worker:
+    image: 'hugotess/multi-worker'
+    mem_limit: 128m
+    hostname: worker
+    environment:
+      - REDIS_HOST=$REDIS_HOST
+      - REDIS_PORT=$REDIS_PORT
+  nginx:
+    image: 'hugotess/multi-nginx'
+    mem_limit: 128m
+    hostname: nginx
+    ports:
+      - '80:80'
