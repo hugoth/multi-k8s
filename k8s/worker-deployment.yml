@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-deployment
+spec:
+  replicas: 1 # number of pods
+  selector:
+    matchLabels:
+      component: worker
+  template:
+    metadata:
+      labels:
+        component: worker
+    spec:
+      containers: # One single container with image ugotess/multi-worker in 1 pod (replicas)
+        - name: worker
+          image: hugotess/multi-worker
+          env:
+            - name: REDIS_HOST # name of the env variable that will be accessible by Process.env inside this container
+              value: redis-cluster-ip-service # name if the redis cluster ip service, entry point for redis container
+            - name: REDIS_PORT
+              value: '6379' # env variable must be string
+# There is no need to create a cluster ip service for this container / service, its job occurs in the background, no need to be reacheable from the outside world

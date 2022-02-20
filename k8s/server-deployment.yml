@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+spec:
+  replicas: 3 # number of pods
+  selector:
+    matchLabels:
+      component: server
+  template: # pods template, all pods / replicas will have this set up
+    metadata:
+      labels:
+        component: server
+    spec:
+      containers: # One single container with image hugotess/multi-server in 3 pods (replicas)
+        - name: server
+          image: hugotess/multi-server
+          ports:
+            - containerPort: 5000
+          env:
+            - name: REDIS_HOST # name of the env variable that will be accessible by Process.env inside this container
+              value: redis-cluster-ip-service # name if the redis cluster ip service, entry point for redis container
+            - name: REDIS_PORT
+              value: '6379' # env variable must be string
+            - name: PG_USER
+              value: postgres
+            - name: PG_HOST
+              value: postgres-cluster-ip-service # name if the postgres cluster ip service, entry point for postgres container
+            - name: PG_PORT
+              value: '5432' # env variable must be string
+            - name: PG_DATABASE
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword # name of the secret created by command line
+                  key: PG_PASSWORD # name of the key, the key value pair was provided in the creation command

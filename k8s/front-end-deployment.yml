@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  replicas: 3 # number of pods
+  selector:
+    matchLabels:
+      component: web
+  template: # pods template, all pods / replicas will have this set up
+    metadata:
+      labels:
+        component: web
+    spec:
+      containers: # One single container with image hugotess/multi-frontend in 3 pods (replicas)
+        - name: frontend
+          image: hugotess/multi-frontend
+          ports:
+            - containerPort: 3000
