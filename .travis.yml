@@ -1,0 +1,10 @@
+sudo: required
+services:
+  - docker # docker must be pre installed when we run our build, we need travis to build images and run test
+
+before_install: # Set up google cloud
+  - curl https://sdk.cloud.google.com | bash > /dev/null; # This command dowload google cloud sdk and install it
+  - source $HOME/google-cloud-sdk/path.bash.inc # required command
+  - gcloud component update kubectl # install & update kubectl commmand inside travis environment => for imperative commands
+  - gcloud auth activate-service-account --key-file service-account.json # In order to login to gcloud, we provided an auth file => service-account.json
+  - openssl aes-256-cbc -K $encrypted_9f3b5599b056_key -iv $encrypted_9f3b5599b056_iv -in service-account.json.enc -out service-account.json -d
