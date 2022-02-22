@@ -1,10 +1,28 @@
 sudo: required
 services:
   - docker # docker must be pre installed when we run our build, we need travis to build images and run test
+env:
+  global:
+    - SHA=$(git rev-parse HEAD) # getting the commit sha, add it to the global env in travis env to add it as tag on new images on deployment
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1 # disale gcloud user prompt in the deployment flow
 
 before_install: # Set up google cloud
-  - curl https://sdk.cloud.google.com | bash > /dev/null; # This command dowload google cloud sdk and install it
+  - openssl aes-256-cbc -K $encrypted_9f3b5599b056_key -iv $encrypted_9f3b5599b056_iv -in service-account.json.enc -out service-account.json -d # tell travis to decrypt service-account.json.enc and place it in the directory
+  - curl https://sdk.cloud.google.com | bash > /dev/null; # This command download google cloud sdk and install it
   - source $HOME/google-cloud-sdk/path.bash.inc # required command
   - gcloud component update kubectl # install & update kubectl commmand inside travis environment => for imperative commands
   - gcloud auth activate-service-account --key-file service-account.json # In order to login to gcloud, we provided an auth file => service-account.json
-  - openssl aes-256-cbc -K $encrypted_9f3b5599b056_key -iv $encrypted_9f3b5599b056_iv -in service-account.json.enc -out service-account.json -d
+  - gcloud config set project velvety-argon-341921 # we are login, we need to specify wich project to use, and pass the project id
+  - gcloud config set compute/zone europe-west3-a # set geographical zone
+  - gccloud container clusters get-credentials cluster-1 #tell gcloud to reach out the specific cluster with cluster name : "cluster-1"
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin #login into docker, we have access to docker because we list it in service above, the password and username are env variables set in travis dashboard
+  - docker build -t hugotess/react-test -f ./frontend/Dockerfile.dev ./frontend #We build the front end test image to be able to run test
+
+script:
+  - docker run -e CI=true hugotess/react-test npm test #run docker react test container
+
+deploy:
+  provider: script
+  script: bash ./deploy.sh #We use a custom script file that will handle deployment
+  on:
+    branch: master # Will run the deployment script only when code pushes on branch master
