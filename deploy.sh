@@ -3,7 +3,7 @@
 # We can add the git SHA as unique identifier for our new images 
 # We also add the latest tag to the new image, so in the future we don't have to know the sha to run those images
 docker build -t hugotess/multi-frontend:latest -t hugotess/multi-frontend:$SHA -f ./frontend/Dockerfile ./frontend 
-docker build -t hugotess/multi-server:latest -t hugotess/multi-server:$SHA - -f ./server/Dockerfile ./server
+docker build -t hugotess/multi-server:latest -t hugotess/multi-server:$SHA -f ./server/Dockerfile ./server
 docker build -t hugotess/multi-worker:latest -t hugotess/multi-worker:$SHA -f ./worker/Dockerfile ./worker
 # then we pushed those new image to docker hub
 docker push hugotess/multi-frontend:latest
