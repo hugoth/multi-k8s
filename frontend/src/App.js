@@ -12,7 +12,7 @@ function App() {
         <header className='App-header'>
           <img src={logo} className='App-logo' alt='logo' />
           <p>
-            Coucou le nouveau merge <code>src/App.js</code> and save to reload. Test protect master branch
+            Coucou le nouveau merge <code>src/App.js</code> and save to reload. Test protect master branch 2
           </p>
           <a className='App-link' href='https://reactjs.org' target='_blank' rel='noopener noreferrer'>
             Learn React
