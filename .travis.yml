@@ -14,7 +14,7 @@ before_install: # Set up google cloud
   - gcloud auth activate-service-account --key-file service-account.json # In order to login to gcloud, we provided an auth file => service-account.json
   - gcloud config set project velvety-argon-341921 # we are login, we need to specify wich project to use, and pass the project id
   - gcloud config set compute/zone europe-west3-a # set geographical zone
-  - gccloud container clusters get-credentials cluster-1 #tell gcloud to reach out the specific cluster with cluster name : "cluster-1"
+  - gcloud container clusters get-credentials cluster-1 #tell gcloud to reach out the specific cluster with cluster name : "cluster-1"
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin #login into docker, we have access to docker because we list it in service above, the password and username are env variables set in travis dashboard
   - docker build -t hugotess/react-test -f ./frontend/Dockerfile.dev ./frontend #We build the front end test image to be able to run test
 
